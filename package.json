@@ -1,0 +1,33 @@
+{
+  "name": "uni-mosque-project",
+  "version": "0.0.1",
+  "description": "",
+  "main": "server.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Nimabht/uni-mosque.git"
+  },
+  "author": "Nima Beheshtaein",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Nimabht/uni-mosque/issues"
+  },
+  "homepage": "https://github.com/Nimabht/uni-mosque#readme",
+  "dependencies": {
+    "@types/express": "^4.17.21",
+    "@types/joi": "^17.2.3",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/mysql": "^2.15.26",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "joi": "^17.13.1",
+    "jsonwebtoken": "^9.0.2",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "ts-node-dev": "^2.0.0"
+  }
+}
