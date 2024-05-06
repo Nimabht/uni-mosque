@@ -1,6 +1,6 @@
 import express from "express";
 import authRouter from "./auth";
-// import userRouter from "./user";
+import userRouter from "./user";
 // import clientRouter from "./client";
 // import dockerRouter from "./docker";
 // import { USAGE_MODE } from "../config";
@@ -8,7 +8,7 @@ import authRouter from "./auth";
 const apiRouter = express.Router();
 
 apiRouter.use("/auth", authRouter);
-// apiRouter.use("/user", userRouter);
+apiRouter.use("/user", userRouter);
 // apiRouter.use("/client", clientRouter);
 
 export default apiRouter;

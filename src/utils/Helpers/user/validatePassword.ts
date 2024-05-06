@@ -5,6 +5,5 @@ export default async function validatePassword(
   hashedPassword: string,
 ) {
   const isValid = await bcrypt.compare(password, hashedPassword);
-  console.log(isValid);
   return isValid;
 }

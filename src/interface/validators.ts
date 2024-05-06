@@ -11,3 +11,11 @@ export interface LoginInfo {
   username: string | undefined;
   password: string | undefined;
 }
+
+export interface UpdateInfo {
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  phone_number?: string;
+  role?: string;
+}
