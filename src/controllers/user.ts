@@ -8,6 +8,7 @@ import userSearch from "../utils/Helpers/user/userSearchQuery";
 import MySQLDriver from "../db/mysql/connection";
 import { RowDataPacket } from "mysql2";
 import { validateUserForUpdate } from "../validators/user";
+import resizeUserAvatar from "../utils/imageResizer/resizeUserAvatar";
 // import resizeUserAvatar from "../utils/resizeImage/resizeUserAvatar";
 // import { Article } from "../models/article";
 // import articleRemover from "../utils/articleRemover";
@@ -36,7 +37,7 @@ class UserController {
       ]);
     } else {
       query = `
-      SELECT id,username,first_name,last_name,phone_number,role,created_at,updated_at 
+      SELECT id,username,first_name,last_name,phone_number,role,avatar_path,created_at,updated_at 
       FROM users `;
       result = await MySQLDriver.queryAsync<RowDataPacket[]>(query, []);
     }
@@ -61,7 +62,7 @@ class UserController {
     const userId = req.params.userId;
 
     const query = `
-      SELECT id,username,first_name,last_name,phone_number,role,created_at,updated_at 
+      SELECT id,username,first_name,last_name,phone_number,role,avatar_path,created_at,updated_at 
       FROM users WHERE id = ?`;
     const result = await MySQLDriver.queryAsync<RowDataPacket[]>(query, [
       userId,
@@ -115,8 +116,6 @@ class UserController {
       WHERE id = ?
     `;
 
-    console.log(query);
-
     const updateValues = Object.values(updateFields);
     updateValues.push(userId);
 
@@ -130,26 +129,32 @@ class UserController {
     }
   }
 
-  // async updateUserAvatar(req: Request, res: Response, next: NextFunction) {
-  //   if (!req.file) {
-  //     const ex = AppError.badRequest("File is empty.");
-  //     return next(ex);
-  //   }
+  async updateUserAvatar(req: Request, res: Response, next: NextFunction) {
+    if (!req.file) {
+      const ex = AppError.badRequest("File is empty.");
+      return next(ex);
+    }
 
-  //   const user = res.locals.user;
-  //   // delete the previous avatar
-  //   if (
-  //     user.avatarFileName !== "male-anonymous.png" &&
-  //     user.avatarFileName !== "female-anonymous.png"
-  //   ) {
-  //     const path = join("public", "avatars", user.avatarFileName);
-  //     await fsPromises.unlink(path);
-  //   }
-  //   const filename = await resizeUserAvatar(req.file);
-  //   user.avatarFileName = filename;
-  //   await user.save();
-  //   res.status(200).end();
-  // }
+    const user = req.user;
+    const userId = req.params.userId;
+
+    // delete the previous avatar
+    if (user.avatar_path !== "anonymous.png" && user.avatar_path !== "") {
+      const path = join("public", "avatars", user.avatar_path);
+      await fsPromises.unlink(path);
+    }
+
+    const filename = await resizeUserAvatar(req.file);
+
+    const query = `
+      UPDATE users 
+      SET avatar_path = ?
+      WHERE id = ?
+    `;
+
+    await MySQLDriver.queryAsync(query, [filename, userId]);
+    res.status(200).end();
+  }
 
   async deleteUser(req: Request, res: Response, next: NextFunction) {
     const userId = req.params.userId;
