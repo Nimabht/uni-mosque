@@ -19,3 +19,13 @@ export interface UpdateInfo {
   phone_number?: string;
   role?: string;
 }
+
+export interface AvailableTimesQuery {
+  date_from?: string;
+  date_to?: string;
+}
+
+export interface AvailableTimeBody {
+  start_date: string;
+  end_date: string;
+}

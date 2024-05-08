@@ -1,14 +1,12 @@
 import express from "express";
 import authRouter from "./auth";
 import userRouter from "./user";
-// import clientRouter from "./client";
-// import dockerRouter from "./docker";
-// import { USAGE_MODE } from "../config";
+import availableTimeRouter from "./availableTime";
 
 const apiRouter = express.Router();
 
 apiRouter.use("/auth", authRouter);
 apiRouter.use("/user", userRouter);
-// apiRouter.use("/client", clientRouter);
+apiRouter.use("/available-time", availableTimeRouter);
 
 export default apiRouter;
