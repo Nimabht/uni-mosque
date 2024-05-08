@@ -178,6 +178,40 @@ class UserController {
     await MySQLDriver.queryAsync(query, [userId]);
     res.status(204).end();
   }
+
+  async getUserAvatar(req: Request, res: Response, next: NextFunction) {
+    const userId = req.params.userId;
+
+    const query = `
+      SELECT avatar_path FROM users WHERE id = ?`;
+    const result = await MySQLDriver.queryAsync<RowDataPacket[]>(query, [
+      userId,
+    ]);
+
+    if (result.length === 0) {
+      const ex = AppError.notFound("User avatar not found.");
+      return next(ex);
+    }
+
+    if (
+      result[0].avatar_path === "" ||
+      result[0].avatar_path === "anonymous.png"
+    ) {
+      const path = join(__dirname, "../../public", "avatars", "anonymous.png");
+
+      res.sendFile(path);
+      return;
+    }
+
+    const avatarPath = join(
+      __dirname,
+      "../../public",
+      "avatars",
+      result[0].avatar_path,
+    );
+
+    res.sendFile(avatarPath);
+  }
 }
 
 const userController = new UserController();

@@ -6,10 +6,10 @@ const hasAccessByAdminOrOwner = (
   res: Response,
   next: NextFunction,
 ) => {
-  const { id, role } = req.tokenPayload;
-  const { userId } = req.params;
+  const { userId, role } = req.tokenPayload;
+  const id = req.params.userId;
 
-  if (role === "Admin" || id === userId) {
+  if (role === "Admin" || id == userId) {
     next();
   } else {
     const ex = AppError.Forbidden("Forbidden");

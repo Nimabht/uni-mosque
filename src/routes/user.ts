@@ -20,6 +20,12 @@ router.get(
 );
 
 router.get(
+  "/avatar/:userId",
+  [jwtValidator, hasAccessByAdminOrOwner],
+  asyncMiddleware(userController.getUserAvatar),
+);
+
+router.get(
   "/:userId",
   [jwtValidator, hasAccessByRole(["Admin"])],
   asyncMiddleware(userController.getUserById),
@@ -27,7 +33,7 @@ router.get(
 
 router.put(
   "/:userId",
-  [jwtValidator, hasAccessByAdminOrOwner, hasAccessByRole(["Admin"])],
+  [jwtValidator, hasAccessByAdminOrOwner],
   asyncMiddleware(userController.updateUser),
 );
 
