@@ -1,25 +1,13 @@
 import { Request, Response, NextFunction } from "express";
-// import { User } from "../models/user";
-// import validators from "../validators/user";
 import AppError from "../utils/Classes/AppError";
-import { join } from "path";
-import { promises as fsPromises } from "fs";
-import userSearch from "../utils/Helpers/user/userSearchQuery";
 import MySQLDriver from "../db/mysql/connection";
 import { RowDataPacket } from "mysql2";
-import { validateUserForUpdate } from "../validators/user";
-import resizeUserAvatar from "../utils/imageResizer/resizeUserAvatar";
 import moment from "moment";
 import {
   validateAvailableTimesQuery,
   validateCreateNewAvailableTimeBody,
+  validateUpdateAvailableTimeBody,
 } from "../validators/availableTime";
-// import resizeUserAvatar from "../utils/resizeImage/resizeUserAvatar";
-// import { Article } from "../models/article";
-// import articleRemover from "../utils/articleRemover";
-// import { Comment } from "../models/comment";
-// import userSearch from "../utils/userSearch";
-// import paginate from "../utils/pagination";
 
 class AvailableTimeController {
   async getAllAvailableTime(req: Request, res: Response, next: NextFunction) {
@@ -63,7 +51,7 @@ class AvailableTimeController {
       const ex = AppError.badRequest(error.toString());
       return next(ex);
     }
-    const { start_date, end_date } = value;
+    const { start_date, end_date, price, description } = value;
     // Check for conflicts
     const conflictQuery = `
       SELECT * FROM available_times 
@@ -85,11 +73,9 @@ class AvailableTimeController {
     }
 
     const result: any = await MySQLDriver.queryAsync<RowDataPacket[]>(
-      `INSERT INTO available_times (start_date,end_date) VALUES (?, ?)`,
-      [start_date, end_date],
+      `INSERT INTO available_times (start_date,end_date,price,description) VALUES (?, ? , ? , ?)`,
+      [start_date, end_date, price, description],
     );
-
-    console.log(result);
 
     if (result.affectedRows !== "0") {
       res.status(201).end();
@@ -112,6 +98,48 @@ class AvailableTimeController {
     `;
     await MySQLDriver.queryAsync(query, [availableTime?.id]);
     res.status(204).end();
+  }
+  async updateAvailableTime(req: Request, res: Response, next: NextFunction) {
+    const { error, value } = validateUpdateAvailableTimeBody(req.body);
+    const availableTime = req.availableTime;
+
+    if (!!error) {
+      const ex = AppError.badRequest(error.toString());
+      return next(ex);
+    }
+
+    let { price, description } = value;
+
+    if (availableTime?.reserved === 1) {
+      const ex = AppError.Forbidden(
+        "This available time has been reserved and cannot be updated.",
+      );
+      return next(ex);
+    }
+
+    // Update only the updatable fields
+    const updateFields = {
+      price,
+      description,
+    };
+
+    const updateQuery = `
+      UPDATE available_times 
+      SET ? 
+      WHERE id = ?
+    `;
+
+    const result: any = await MySQLDriver.queryAsync<RowDataPacket[]>(
+      updateQuery,
+      [updateFields, availableTime?.id],
+    );
+
+    if (result.changedRows !== "0") {
+      res.status(200).json({ message: "Available time updated successfully" });
+    } else {
+      const ex = AppError.internal("");
+      return next(ex);
+    }
   }
 }
 

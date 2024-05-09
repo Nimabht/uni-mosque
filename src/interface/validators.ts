@@ -29,3 +29,10 @@ export interface AvailableTimeBody {
   start_date: string;
   end_date: string;
 }
+
+export interface UpdateAvailableTimeBody {
+  start_date?: string;
+  end_date?: string;
+  price?: number;
+  description?: string;
+}

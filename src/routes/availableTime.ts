@@ -26,22 +26,11 @@ router.delete(
   [jwtValidator, hasAccessByRole(["Admin"])],
   asyncMiddleware(availableTimeController.deleteAvailableTime),
 );
-// router.get(
-//   "/:userId",
-//   [jwtValidator, hasAccessByRole(["Admin"])],
-//   asyncMiddleware(userController.getUserById),
-// );
 
-// router.put(
-//   "/:userId",
-//   [jwtValidator, hasAccessByAdminOrOwner],
-//   asyncMiddleware(userController.updateUser),
-// );
-
-// router.patch(
-//   "/update-avatar/:userId",
-//   [jwtValidator, hasAccessByAdminOrOwner, uploadAvatar],
-//   asyncMiddleware(userController.updateUserAvatar),
-// );
+router.put(
+  "/:availableTimeId",
+  [jwtValidator, hasAccessByRole(["Admin"])],
+  asyncMiddleware(availableTimeController.updateAvailableTime),
+);
 
 export default router;
