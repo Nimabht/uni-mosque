@@ -12,6 +12,8 @@ declare global {
       permission;
       basic_username?: string;
       basic_password?: string;
+      availableTimseUserCheck?: string;
+      reservation?: any;
     }
   }
 }
