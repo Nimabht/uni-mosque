@@ -2,7 +2,6 @@ import express, { Router } from "express";
 import asyncMiddleware from "../middlewares/async";
 import jwtValidator from "../middlewares/auth/jwtValidator";
 import hasAccessByRole from "../middlewares/auth/hasAccessByRole";
-import getAvailableTime from "../middlewares/availableTime/getAvailableTime";
 import reservationController from "./../controllers/reservation";
 import getReservation from "../middlewares/reservation/getReservation";
 
@@ -14,6 +13,12 @@ router.get(
   "",
   [jwtValidator, hasAccessByRole(["Admin"])],
   asyncMiddleware(reservationController.getAllReservations),
+);
+
+router.get(
+  "/my",
+  [jwtValidator, hasAccessByRole(["Admin", "User"])],
+  asyncMiddleware(reservationController.getAllReservationsForUser),
 );
 
 router.get(
