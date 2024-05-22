@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import MySQLDriver from "../db/mysql/connection";
 import { RowDataPacket } from "mysql2";
 import AppError from "../utils/Classes/AppError";
+import { validateReservationQuery } from "../validators/reservation";
 
 class ReservationController {
   // Get all reservations with optional pagination and date range filters
@@ -74,6 +75,13 @@ class ReservationController {
     res: Response,
     next: NextFunction,
   ) {
+    const { value, error } = validateReservationQuery(req.query);
+
+    if (!!error) {
+      const ex = AppError.badRequest(error.toString());
+      return next(ex);
+    }
+
     const userId = req.tokenPayload.userId;
 
     let { page, per_page, available_time_date_from, available_time_date_to } =
