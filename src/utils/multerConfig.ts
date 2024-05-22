@@ -29,6 +29,16 @@ const uploadAvatar: RequestHandler = multer({
   },
 }).single("avatar");
 
+// Multer upload configurations
+const uploadLogo: RequestHandler = multer({
+  storage: storage,
+  fileFilter: multerFilter,
+  limits: {
+    files: 1,
+    fileSize: 5 * 1024 * 1024, // 5 MB
+  },
+}).single("logo");
+
 // const uploadThumbnail: RequestHandler = multer({
 //   storage: storage,
 //   fileFilter: multerFilter,
@@ -47,4 +57,4 @@ const uploadAvatar: RequestHandler = multer({
 //   },
 // }).single("image");
 
-export { uploadAvatar };
+export { uploadAvatar, uploadLogo };
