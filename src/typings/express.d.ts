@@ -9,6 +9,7 @@ declare global {
       availableTime?: IAvailableTime;
       client;
       user;
+      comment?: any;
       permission;
       basic_username?: string;
       basic_password?: string;
