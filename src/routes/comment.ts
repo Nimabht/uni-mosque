@@ -23,7 +23,7 @@ router.get(
 router.get("/:commentId", asyncMiddleware(commentsController.getCommentById));
 
 router.patch(
-  "/showStatus",
+  "/showStatus/:commentId",
   [jwtValidator, hasAccessByRole(["admin"])],
   asyncMiddleware(commentsController.updateCommentShowStatus),
 );
