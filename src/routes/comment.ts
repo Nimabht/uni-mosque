@@ -11,7 +11,7 @@ router.param("commentId", getCommnet);
 
 router.get(
   "",
-  [jwtValidator, hasAccessByRole(["admin"])],
+  [jwtValidator, hasAccessByRole(["Admin"])],
   asyncMiddleware(commentsController.getAllComments),
 );
 
@@ -24,7 +24,7 @@ router.get("/:commentId", asyncMiddleware(commentsController.getCommentById));
 
 router.patch(
   "/showStatus/:commentId",
-  [jwtValidator, hasAccessByRole(["admin"])],
+  [jwtValidator, hasAccessByRole(["Admin"])],
   asyncMiddleware(commentsController.updateCommentShowStatus),
 );
 
@@ -32,7 +32,7 @@ router.post("", asyncMiddleware(commentsController.createComment));
 
 router.delete(
   "/:commentId",
-  [jwtValidator, hasAccessByRole(["admin"])],
+  [jwtValidator, hasAccessByRole(["Admin"])],
   asyncMiddleware(commentsController.deleteComment),
 );
 

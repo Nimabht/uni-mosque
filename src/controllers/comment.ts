@@ -162,6 +162,13 @@ class CommentController {
       const commentableType = req.params.commentable_type as string;
       const commentableId = parseInt(req.params.commentable_id as string);
 
+      if (commentableType !== "blog" && commentableType !== "journal") {
+        const ex = AppError.badRequest(
+          'Commentable type must be either "blog" or "journal"',
+        );
+        return next(ex);
+      }
+
       // Construct the SQL query to select comments recursively
       const query = `
         WITH RECURSIVE CommentHierarchy AS (

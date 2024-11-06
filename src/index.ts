@@ -1,7 +1,9 @@
 import express, { Express, NextFunction, Request, Response } from "express";
 import globalErrorHandler from "./middlewares/globalErrorHandler";
 import apiRouter from "./routes/api";
+import cors from "cors";
 const app: Express = express();
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 // app.use(cookieParser());
