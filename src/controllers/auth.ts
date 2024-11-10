@@ -36,7 +36,17 @@ class AuthController {
     }
     const token = userGenerateToken(user, "20d");
 
-    res.json({ access_token: token });
+    res.json({
+      access_token: token,
+      userInfo: {
+        id: user.id,
+        username: user.username,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        phone_number: user.phone_number,
+        role: user.role,
+      },
+    });
   }
 
   async signup(req: Request, res: Response, next: NextFunction) {
