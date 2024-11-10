@@ -27,7 +27,7 @@ router.get(
 
 router.get(
   "/:userId",
-  [jwtValidator, hasAccessByRole(["Admin"])],
+  [jwtValidator, hasAccessByAdminOrOwner],
   asyncMiddleware(userController.getUserById),
 );
 
