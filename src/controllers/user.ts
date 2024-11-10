@@ -62,7 +62,7 @@ class UserController {
     const userId = req.params.userId;
 
     const query = `
-      SELECT id,username,first_name,last_name,phone_number,role,avatar_path,created_at,updated_at 
+      SELECT id,username,first_name,last_name,phone_number,role,created_at,updated_at 
       FROM users WHERE id = ?`;
     const result = await MySQLDriver.queryAsync<RowDataPacket[]>(query, [
       userId,
