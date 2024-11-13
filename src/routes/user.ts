@@ -25,6 +25,12 @@ router.get(
   asyncMiddleware(userController.getUserAvatar),
 );
 
+router.patch(
+  "/role/:userId",
+  [jwtValidator, hasAccessByRole(["Admin"])],
+  asyncMiddleware(userController.updateUserRole),
+);
+
 router.get(
   "/:userId",
   [jwtValidator, hasAccessByAdminOrOwner],

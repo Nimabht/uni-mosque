@@ -212,6 +212,34 @@ class UserController {
 
     res.sendFile(avatarPath);
   }
+
+  async updateUserRole(req: Request, res: Response, next: NextFunction) {
+    const userId = req.params.userId;
+    const { role } = req.body;
+
+    // Define allowed roles for validation
+    const allowedRoles = ["Admin", "User", "Blogger"];
+    if (!allowedRoles.includes(role)) {
+      const ex = AppError.badRequest("Invalid role specified.");
+      return next(ex);
+    }
+
+    // Update user's role in the database
+    const query = `
+      UPDATE users 
+      SET role = ?
+      WHERE id = ?
+    `;
+
+    const result: any = await MySQLDriver.queryAsync(query, [role, userId]);
+
+    if (result.changedRows > 0) {
+      res.status(200).json({ message: "User role updated successfully." });
+    } else {
+      const ex = AppError.notFound("User not found or role unchanged.");
+      return next(ex);
+    }
+  }
 }
 
 const userController = new UserController();
