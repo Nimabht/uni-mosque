@@ -27,10 +27,22 @@ router.get(
   asyncMiddleware(reservationController.getReservationById),
 );
 
+router.post(
+  "/:availableTimeId/make",
+  [jwtValidator, hasAccessByRole(["Admin", "User"])],
+  asyncMiddleware(reservationController.makeReservation),
+);
+
+router.delete(
+  "/:reservationId/undo",
+  [jwtValidator, hasAccessByRole(["Admin", "User"])],
+  asyncMiddleware(reservationController.undoReservation),
+);
+
 // router.post(
-//   "",
-//   [jwtValidator, hasAccessByRole(["Admin"])],
-//   asyncMiddleware(availableTimeController.createAvailableTime),
+//   ":availableTimeId",
+//   [jwtValidator, hasAccessByRole(["Admin", "User"])],
+//   asyncMiddleware(reservationController.makeReservation),
 // );
 
 // router.delete(

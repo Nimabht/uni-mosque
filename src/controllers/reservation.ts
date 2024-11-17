@@ -141,6 +141,95 @@ class ReservationController {
       data: paginatedResults,
     });
   }
+
+  // Make a reservation
+  async makeReservation(req: Request, res: Response, next: NextFunction) {
+    const userId = req.tokenPayload.userId;
+    const availableTimeId = req.params.availableTimeId;
+
+    //Check if available time is exists and not already reserved
+    const availableTimeQuery = `
+      SELECT * FROM available_times WHERE id = ? AND is_reserved = 0
+    `;
+    const availableTimeResult = await MySQLDriver.queryAsync<RowDataPacket[]>(
+      availableTimeQuery,
+      [availableTimeId],
+    );
+
+    if (availableTimeResult.length === 0) {
+      const ex = AppError.notFound(
+        "Available time not found or already reserved",
+      );
+      return next(ex);
+    }
+
+    //Generate random tracking code
+    const trackingCode = Math.random().toString(36).substr(2, 9);
+
+    const { description } = req.body;
+
+    const query = `
+      INSERT INTO reservations (user_id, availableTime_id, description,tracking_code,status)
+      VALUES (?, ?, ?, ?,?)
+    `;
+
+    const result: any = await MySQLDriver.queryAsync<RowDataPacket[]>(query, [
+      userId,
+      availableTimeId,
+      description,
+      trackingCode,
+      "Pending",
+    ]);
+
+    const updateAvailableTimeStatus = `
+      UPDATE available_times SET reserved = 1 WHERE id = ?
+      `;
+
+    await MySQLDriver.queryAsync<RowDataPacket[]>(updateAvailableTimeStatus, [
+      availableTimeId,
+    ]);
+
+    res.json({
+      message: "Reservation created successfully",
+      reservationId: result.insertId,
+    });
+  }
+
+  //Undo a reservation
+  async undoReservation(req: Request, res: Response, next: NextFunction) {
+    const reservationId = req.params.reservationId;
+    const userId = req.tokenPayload.userId;
+
+    //Check if reservation is exists and reserved by the user
+
+    const reservationQuery = `
+      SELECT * FROM reservations WHERE id = ? AND user_id = ? AND status = 'Pending'
+    `;
+
+    const isValidReservation: any = await MySQLDriver.queryAsync<
+      RowDataPacket[]
+    >(reservationQuery, [reservationId, userId]);
+
+    if (isValidReservation.length === 0) {
+      const ex = AppError.notFound("Reservation not found");
+      return next(ex);
+    }
+
+    const query = `
+      DELETE FROM reservations WHERE id = ?
+    `;
+
+    const result: any = await MySQLDriver.queryAsync<RowDataPacket[]>(query, [
+      reservationId,
+    ]);
+
+    if (result.affectedRows === 0) {
+      const ex = AppError.notFound("Reservation not found");
+      return next(ex);
+    }
+
+    res.json({ message: "Reservation deleted successfully" });
+  }
 }
 
 const reservationController = new ReservationController();
