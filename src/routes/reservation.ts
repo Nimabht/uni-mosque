@@ -7,7 +7,7 @@ import getReservation from "../middlewares/reservation/getReservation";
 
 const router: Router = express.Router();
 
-router.param("availableTimeId", getReservation);
+// router.param("availableTimeId", getReservation);
 
 router.get(
   "",
