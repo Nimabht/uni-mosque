@@ -5,4 +5,5 @@ export type IAvailableTime = {
   created_at: string;
   updated_at: string;
   reserved: number;
+  reservation: any;
 };
