@@ -149,7 +149,7 @@ class ReservationController {
 
     //Check if available time is exists and not already reserved
     const availableTimeQuery = `
-      SELECT * FROM available_times WHERE id = ? AND is_reserved = 0
+      SELECT * FROM available_times WHERE id = ? AND reserved = 0
     `;
     const availableTimeResult = await MySQLDriver.queryAsync<RowDataPacket[]>(
       availableTimeQuery,
@@ -227,6 +227,14 @@ class ReservationController {
       const ex = AppError.notFound("Reservation not found");
       return next(ex);
     }
+
+    const updateAvailableTimeStatus = `
+      UPDATE available_times SET reserved = 0 WHERE id = ?
+      `;
+
+    await MySQLDriver.queryAsync<RowDataPacket[]>(updateAvailableTimeStatus, [
+      isValidReservation[0].availableTime_id,
+    ]);
 
     res.json({ message: "Reservation deleted successfully" });
   }
