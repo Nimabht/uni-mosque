@@ -21,12 +21,6 @@ router.get(
   asyncMiddleware(reservationController.getAllReservationsForUser),
 );
 
-router.get(
-  "/:reservationId",
-  [jwtValidator, hasAccessByRole(["Admin", "User"])],
-  asyncMiddleware(reservationController.getReservationById),
-);
-
 router.post(
   "/:availableTimeId/make",
   [jwtValidator, hasAccessByRole(["Admin", "User"])],
@@ -37,6 +31,12 @@ router.delete(
   "/:reservationId/undo",
   [jwtValidator, hasAccessByRole(["Admin", "User"])],
   asyncMiddleware(reservationController.undoReservation),
+);
+
+router.get(
+  "/:reservationId",
+  [jwtValidator, hasAccessByRole(["Admin", "User"])],
+  asyncMiddleware(reservationController.getReservationById),
 );
 
 // router.post(
