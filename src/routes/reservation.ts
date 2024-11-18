@@ -22,13 +22,13 @@ router.get(
 );
 
 router.post(
-  "/:availableTimeId/make",
+  "/make/:availableTimeId",
   [jwtValidator, hasAccessByRole(["Admin", "User"])],
   asyncMiddleware(reservationController.makeReservation),
 );
 
 router.delete(
-  "/:reservationId/undo",
+  "/undo/:reservationId",
   [jwtValidator, hasAccessByRole(["Admin", "User"])],
   asyncMiddleware(reservationController.undoReservation),
 );
