@@ -141,7 +141,7 @@ class CommentController {
 
       // Create a temporary table to store the comment hierarchy
       await MySQLDriver.queryAsync(`
-      CREATE TEMPORARY TABLE CommentHierarchy (id INT PRIMARY KEY)
+      CREATE TEMPORARY TABLE IF NOT EXISTS CommentHierarchy (id INT PRIMARY KEY)
     `);
 
       // Populate the temporary table with the hierarchy of comments
@@ -164,6 +164,11 @@ class CommentController {
       DELETE FROM comments WHERE id IN (SELECT id FROM CommentHierarchy)
     `);
 
+      // Drop the temporary table
+      await MySQLDriver.queryAsync(
+        "DROP TEMPORARY TABLE IF EXISTS CommentHierarchy",
+      );
+
       // Commit the transaction
       await MySQLDriver.queryAsync("COMMIT");
 
@@ -177,6 +182,9 @@ class CommentController {
     } catch (error: any) {
       // Rollback the transaction in case of error
       await MySQLDriver.queryAsync("ROLLBACK");
+      await MySQLDriver.queryAsync(
+        "DROP TEMPORARY TABLE IF EXISTS CommentHierarchy",
+      );
       const ex = AppError.internal(error.message);
       return next(ex);
     }
