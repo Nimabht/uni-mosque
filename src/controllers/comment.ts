@@ -114,7 +114,7 @@ class CommentController {
       // Execute the query
       const result: any = await MySQLDriver.queryAsync(query, [
         value.show,
-        commentId,
+        +commentId,
       ]);
 
       // Check if the comment show status was successfully updated
