@@ -136,19 +136,36 @@ class CommentController {
     try {
       const commentId = req.params.commentId;
 
-      // Construct the SQL query to delete the comment and its children recursively
-      const query = `
-        WITH RECURSIVE CommentHierarchy AS (
-          SELECT id FROM comments WHERE id = ?
-          UNION ALL
-          SELECT c.id FROM comments c
-          JOIN CommentHierarchy ch ON c.parent_id = ch.id
-        )
-        DELETE FROM comments WHERE id IN (SELECT id FROM CommentHierarchy)
-      `;
+      // Begin the transaction
+      await MySQLDriver.queryAsync("START TRANSACTION");
 
-      // Execute the query
-      const result: any = await MySQLDriver.queryAsync(query, [commentId]);
+      // Create a temporary table to store the comment hierarchy
+      await MySQLDriver.queryAsync(`
+      CREATE TEMPORARY TABLE CommentHierarchy (id INT PRIMARY KEY)
+    `);
+
+      // Populate the temporary table with the hierarchy of comments
+      await MySQLDriver.queryAsync(
+        `
+      INSERT INTO CommentHierarchy (id)
+      WITH RECURSIVE CommentHierarchyCTE AS (
+        SELECT id FROM comments WHERE id = ?
+        UNION ALL
+        SELECT c.id FROM comments c
+        JOIN CommentHierarchyCTE ch ON c.parent_id = ch.id
+      )
+      SELECT id FROM CommentHierarchyCTE
+    `,
+        [commentId],
+      );
+
+      // Delete the comments using the temporary table
+      const result: any = await MySQLDriver.queryAsync(`
+      DELETE FROM comments WHERE id IN (SELECT id FROM CommentHierarchy)
+    `);
+
+      // Commit the transaction
+      await MySQLDriver.queryAsync("COMMIT");
 
       // Check if any comments were deleted
       if (result.affectedRows > 0) {
@@ -158,10 +175,43 @@ class CommentController {
         return next(ex);
       }
     } catch (error: any) {
+      // Rollback the transaction in case of error
+      await MySQLDriver.queryAsync("ROLLBACK");
       const ex = AppError.internal(error.message);
       return next(ex);
     }
   }
+
+  // async deleteComment(req: Request, res: Response, next: NextFunction) {
+  //   try {
+  //     const commentId = req.params.commentId;
+
+  //     // Construct the SQL query to delete the comment and its children recursively
+  //     const query = `
+  //       WITH RECURSIVE CommentHierarchy AS (
+  //         SELECT id FROM comments WHERE id = ?
+  //         UNION ALL
+  //         SELECT c.id FROM comments c
+  //         JOIN CommentHierarchy ch ON c.parent_id = ch.id
+  //       )
+  //       DELETE FROM comments WHERE id IN (SELECT id FROM CommentHierarchy)
+  //     `;
+
+  //     // Execute the query
+  //     const result: any = await MySQLDriver.queryAsync(query, [commentId]);
+
+  //     // Check if any comments were deleted
+  //     if (result.affectedRows > 0) {
+  //       res.status(204).end();
+  //     } else {
+  //       const ex = AppError.notFound("Comment not found");
+  //       return next(ex);
+  //     }
+  //   } catch (error: any) {
+  //     const ex = AppError.internal(error.message);
+  //     return next(ex);
+  //   }
+  // }
 
   async getAllCommentsByTypeAndId(
     req: Request,
