@@ -49,6 +49,16 @@ class CommentController {
         return next(ex);
       }
 
+      //Check if the journal or blog comments_enabled is true if not forbid user
+      const queryIsEnabled = `SELECT comments_enabled FROM ${commentableType}s WHERE id = ?`;
+      const isEnabled: any[] = await MySQLDriver.queryAsync(queryIsEnabled, [
+        commentableId,
+      ]);
+      if (isEnabled[0].comments_enabled === 0) {
+        const ex = AppError.Forbidden("Comments are disabled for this post");
+        return next(ex);
+      }
+
       // Construct the SQL query to insert the new comment
       const query = `
         INSERT INTO comments (body, name, email, parent_id, commentable_type, commentable_id) 

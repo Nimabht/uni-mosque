@@ -136,7 +136,7 @@ class BlogController {
         AppError.badRequest(error.details.map((e) => e.message).join(", ")),
       );
     }
-    const { title, content } = req.body;
+    const { title, content, comments_enabled } = req.body;
     const author_id = req.tokenPayload.userId;
     const thumbnailFileName = (await resizeThumbnail(req.file)) || null;
 
@@ -146,7 +146,7 @@ class BlogController {
       thumbnailFileName,
       content,
       author_id,
-      0,
+      comments_enabled,
     ]);
 
     res.status(201).json({ message: "Blog created successfully" });
