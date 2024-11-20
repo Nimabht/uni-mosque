@@ -107,7 +107,7 @@ class CommentController {
       // Construct the SQL query to update the show attribute of the comment
       const query = `
         UPDATE comments 
-        SET show = ?
+        SET comments.show = ?
         WHERE id = ?
       `;
 
