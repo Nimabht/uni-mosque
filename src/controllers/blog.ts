@@ -118,7 +118,7 @@ class BlogController {
         FROM blogs
         JOIN users ON blogs.author_id = users.id
         ORDER BY blogs.created_at DESC
-        LIMIT 5
+        LIMIT 3
       `;
 
       const blogs = await MySQLDriver.queryAsync<RowDataPacket[]>(query);
