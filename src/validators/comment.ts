@@ -57,8 +57,8 @@ export const validateCommentShowStatus = (
 ) => {
   // Define the Joi schema for comment show status validation
   const schema = Joi.object<CommentShowStatus>({
-    show: Joi.boolean().required().messages({
-      "boolean.base": "Show must be a boolean value",
+    show: Joi.number().allow(0, 1).required().messages({
+      "boolean.base": "Show must be a 0 or 1 (number)",
       "any.required": "Show status is required",
     }),
   });

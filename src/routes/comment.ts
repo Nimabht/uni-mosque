@@ -20,7 +20,11 @@ router.get(
   asyncMiddleware(commentsController.getAllCommentsByTypeAndId),
 );
 
-router.get("/:commentId", asyncMiddleware(commentsController.getCommentById));
+router.get(
+  "/:commentId",
+  [jwtValidator, hasAccessByRole(["Admin"])],
+  asyncMiddleware(commentsController.getCommentById),
+);
 
 router.patch(
   "/showStatus/:commentId",

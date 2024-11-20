@@ -187,7 +187,7 @@ class CommentController {
           SELECT c.* FROM comments c
           JOIN CommentHierarchy ch ON c.parent_id = ch.id
         )
-        SELECT * FROM CommentHierarchy;
+        SELECT * FROM CommentHierarchy WHERE show = 1;
       `;
 
       // Execute the query
