@@ -11,9 +11,13 @@ export const validateBlogForCreate = (CreateInfo: any) => {
     content: Joi.string().optional().messages({
       "string.base": "Content must be a string",
     }),
-    comments_enabled: Joi.boolean().optional().default(false).messages({
-      "boolean.base": "Comments enabled must be a boolean",
-    }),
+    comments_enabled: Joi.number()
+      .allow([0, 1])
+      .optional()
+      .default(0)
+      .messages({
+        "boolean.base": "Comments enabled must be a number",
+      }),
   });
   return schema.validate(CreateInfo, { abortEarly: false });
 };
