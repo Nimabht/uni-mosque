@@ -245,7 +245,7 @@ class CommentController {
           SELECT c.* FROM comments c
           JOIN CommentHierarchy ch ON c.parent_id = ch.id
         )
-        SELECT * FROM CommentHierarchy WHERE show = 1;
+        SELECT * FROM CommentHierarchy WHERE \`show\` = 1;
       `;
 
       // Execute the query
@@ -253,6 +253,8 @@ class CommentController {
         commentableType,
         commentableId,
       ]);
+      console.log(comments);
+      console.log(query, [commentableType, commentableId]);
 
       // Check if comments were found
       if (comments.length > 0) {
